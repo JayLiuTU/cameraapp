@@ -1,3 +1,68 @@
+This is my prototype app intended to turn an old android smartphone into a security camera with AI person and object detection. 
+If you navigate to [lite/examples/object_detection/android](.lite/examples/object_detection/android) this is an Android Studio project that you can run on a physical Android phone running a minimum SDK of 24.
+Currently all that's been done is hijacking the output of the existing tensorflow model and creating a toast popup whenever the model detects a person object, along with a frame counting threshold to avoid false positives and in the future distiguish the beginning and end of an event of interest.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # TensorFlow Examples
 
 <div align="center">

@@ -15,6 +15,7 @@
  */
 package org.tensorflow.lite.examples.objectdetection.fragments
 
+import android.R.attr.data
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.graphics.Bitmap
@@ -24,6 +25,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
+import android.widget.Button
 import android.widget.Toast
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.Camera
@@ -36,19 +38,25 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
-import java.util.LinkedList
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 import org.tensorflow.lite.examples.objectdetection.ObjectDetectorHelper
 import org.tensorflow.lite.examples.objectdetection.R
 import org.tensorflow.lite.examples.objectdetection.databinding.FragmentCameraBinding
 import org.tensorflow.lite.task.vision.detector.Detection
+import java.util.LinkedList
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+
 
 class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
 
     private val TAG = "ObjectDetection"
 
     private var _fragmentCameraBinding: FragmentCameraBinding? = null
+
+    //Jay's varibles
+    private var personSeenFrameCount : Int = 0
+    private var personSeen : Boolean = false
+    //end of Jay's varibles
 
     private val fragmentCameraBinding
         get() = _fragmentCameraBinding!!
@@ -303,6 +311,54 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
       imageWidth: Int
     ) {
         activity?.runOnUiThread {
+
+            //Jay's hack
+
+            if (results != null && results.size >= 1) {
+                results.forEach {
+                    if(it.categories[0].label == "person"){
+                        Log.d("jaysresults", "person detected " + personSeenFrameCount.toString())
+                        personSeenFrameCount+=5
+
+                        //need to see a person for 10 frames in a row to avoid false positives
+                        if(personSeenFrameCount >= 10 && !personSeen){
+
+                            personSeen = true
+
+                            Toast.makeText(
+                                activity, "person detected! you should start to save the video to a file",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            personSeenFrameCount = 10
+                        }
+
+                        if(personSeenFrameCount > 10){
+                            personSeenFrameCount = 10
+                        }
+
+                    } else {
+                        personSeenFrameCount--
+                        if(personSeenFrameCount < 0 ){
+
+                            if(personSeen){
+                                Toast.makeText(
+                                    activity, "person gone! you should end the video",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+
+                            personSeen = false
+                            personSeenFrameCount = 0
+
+                        }
+                    }
+
+                }
+
+            }
+
+            //end of Jay's hack
+
             fragmentCameraBinding.bottomSheetLayout.inferenceTimeVal.text =
                             String.format("%d ms", inferenceTime)
 
